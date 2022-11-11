@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.secondhand.dao.mybatis.mapper.TagMapper">
+	<cache />
+	<insert id="insertTag" parameterType="Tag">
+		<selectKey keyProperty="tagId" resultType="int" order="BEFORE">
+			SELECT TAGID_seq.nextval AS tagId FROM DUAL
+		</selectKey> 
+		INSERT INTO TAG
+		(TAGID, TAGNAME, ITEMID) VALUES
+		(#{tagId}, #{tagName}, #{itemId})
+	</insert>
+	
+	<select id="getTagByItemId" parameterType="int" resultType="Tag">
+	SELECT TAGNAME
+	FROM TAG T, ITEM I
+	WHERE T.ITEMID = #{itemId}
+		AND T.ITEMID = I.ITEMID
+	</select>
+	
+	 <delete id="deleteTag" parameterType="int">
+     DELETE FROM TAG
+     WHERE ITEMID = #{itemId}
+  </delete>
+  
+  <select id="getTagByTagName" parameterType="String" resultType="Tag">
+  SELECT TAGID, TAGNAME, ITEMID
+  FROM TAG
+  WHERE lower(tagName) like #{tagName}
+  </select>
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.secondhand.dao.mybatis.mapper.AccountMapper">
+  <cache />
+
+  <select id="getAccountByUserId" resultType="Account">
+    SELECT USERID, PASSWORD, USERNAME, EMAIL,
+    ADDR1, ADDR2, CITY, ZIP, COUNTRY, PHONE
+    FROM ACCOUNT
+    WHERE USERID = #{userId}
+  </select>
+  
+   <select id="getAccountByUsername" resultType="Account">
+    SELECT USERID, PASSWORD, USERNAME, EMAIL,
+    ADDR1, ADDR2, CITY, ZIP, COUNTRY, PHONE
+    FROM ACCOUNT
+    WHERE USERNAME = #{username}
+  </select>
+
+  <select id="getAccountByUserIdAndPassword" resultType="Account">
+    SELECT USERID, PASSWORD, USERNAME, EMAIL,
+    ADDR1, ADDR2, CITY, ZIP, COUNTRY, PHONE
+    FROM ACCOUNT
+    WHERE USERID = #{param1} AND PASSWORD = #{param2}
+  </select>
+
+  <update id="updateAccount" parameterType="Account">
+    UPDATE ACCOUNT SET
+    USERID = #{userId}, 
+    PASSWORD = #{password}, 
+    USERNAME = #{username}, 
+    EMAIL = #{email}, 
+    ADDR1 = #{addr1},
+    ADDR2 = #{addr2}, 
+    CITY = #{city}, 
+    ZIP = #{zip}, 
+    COUNTRY = #{country}, 
+    PHONE = #{phone},
+    WHERE USERID = #{userId}
+  </update>
+
+  <insert id="insertAccount" parameterType="Account">
+    INSERT INTO ACCOUNT
+      (USERID, PASSWORD, USERNAME, EMAIL, ADDR1, ADDR2, CITY, ZIP, COUNTRY, PHONE)
+    VALUES
+      (#{userId}, #{password}, #{username}, #{email}, #{addr1}, #{addr2,jdbcType=VARCHAR}, #{city}, #{zip}, #{country}, #{phone})
+  </insert>
+</mapper>
