@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - DispatcherServlet application context for the Spring web MVC
+  - implementation of secondhand's web tier.
+  -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 	
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       	http://www.springframework.org/schema/beans/spring-beans.xsd
+       	http://www.springframework.org/schema/context
+       	http://www.springframework.org/schema/context/spring-context.xsd
+       	http://www.springframework.org/schema/mvc 				
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd"> 
+
+	<context:component-scan base-package="com.secondhand.controller" />
+
+	<mvc:annotation-driven/>		<!-- create RequestMappingHandlerMapping -->
+	
+	<tx:annotation-driven transaction-manager="transactionManager"/>	<!-- transaction -->
+	
+	<mvc:default-servlet-handler /> <!-- 로그인 구현 관련  -->
+	
+	<mvc:resources mapping="/**" location="/" />
+	
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<!-- 로그인 구현 관련  -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>messages.validation</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	
+	<!-- 로그인 구현 관련  끝 -->
+	
+	<mvc:view-controller path="/shop/index.do" view-name="index"/>
+	<mvc:view-controller path="/shop/signonForm.do" view-name="account/SignonForm"/> 
+	
+	<mvc:interceptors>
+		<mvc:interceptor>
+    	    <mvc:mapping path="/shop/editAccount.do"/>
+        	<mvc:mapping path="/shop/listOrders.do"/>
+        	<mvc:mapping path="/shop/viewOrder.do"/>
+        	<mvc:mapping path="/shop/newOrder.do"/>
+        	<mvc:mapping path="/shop/item/addItem.do"/>
+        	<mvc:mapping path="/shop/auction/participateItem.do"/>
+        	<mvc:mapping path="/shop/groupBuying/joint.do"/>
+        	<bean class="com.secondhand.controller.mypage.SignonInterceptor" />
+    	</mvc:interceptor>
+	</mvc:interceptors>
+</beans>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.secondhand.dao.mybatis.mapper.GroupBuyingMapper">
+  <cache />
+   <delete id="deleteItem" parameterType="String">
+     DELETE FROM GROUPBUYING
+     WHERE ITEMID = #{itemId}
+  </delete>
+  
+   <insert id="insertGroupBuying" parameterType="GroupBuying">
+    INSERT INTO GROUPBUYING
+      (ITEMID, DISCOUNT, LISTPRICE, DEADLINE, STATE)
+    VALUES
+      (#{itemId}, #{discount}, #{listPrice}, TO_DATE(#{deadLine}, 'yyyy-mm-dd hh24:mi:ss'), #{state})
+  </insert>
+   
+   <update id="updateGroupBuying">
+      UPDATE GROUPBUYING 
+        SET DISCOUNT = #{discount}, LISTPRICE = #{listPrice}, DEADLINE = TO_DATE(#{deadLine}, 'yyyy-mm-dd hh24:mi:ss')
+        WHERE ITEMID = #{itemId}
+   </update>
+   
+   <select id="getGroupBuyingItem" resultType="GroupBuying">
+   SELECT
+         I.ITEMID,
+      I.UNITCOST,
+      I.TITLE,
+       I.DESCRIPTION,
+         I.VIEWCOUNT,
+       I.USERID,
+      I.QTY,
+       I.USERID,
+        I.PRODUCTID,
+       G.DISCOUNT,
+        G.LISTPRICE,
+        G.DEADLINE, 
+        G.STATE
+    FROM GROUPBUYING G, ITEM I
+   WHERE I.ITEMID = #{itemId}
+          AND G.ITEMID = I.ITEMID
+   </select>
+ 
+   <!-- //모든 공동구매 리스트 가져오는 메소드-->
+   <select id="getGroupBuyingList" resultType="GroupBuying">
+       SELECT I.PRODUCTID, I.ITEMID, I.TITLE, I.QTY, I.UNITCOST, G.DISCOUNT, G.LISTPRICE, G.DEADLINE, G.STATE
+       FROM GROUPBUYING G, ITEM I, ACCOUNT A
+	   WHERE A.USERID = I.USERID AND G.ITEMID = I.ITEMID
+
+   </select>
+   
+   <!-- 마감남짜 된건 state 변경 -->
+   <update id="closeGroupBuying" parameterType="Date">
+       <![CDATA[
+        UPDATE GROUPBUYING SET STATE = 1
+        WHERE DEADLINE <= #{curTime}
+       ]]>
+     </update>
+     
+     <update id="soldOutGroupBuying">
+       <![CDATA[
+        UPDATE GROUPBUYING
+		SET STATE = 1
+		WHERE ITEMID = #{itemId}
+       ]]>
+     </update>
+</mapper>

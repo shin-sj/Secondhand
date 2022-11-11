@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.secondhand.dao.mybatis.mapper.AuctionMapper">
+  <cache />
+  <select id="getAuctionList" resultType="Auction">
+    SELECT
+      I.ITEMID,
+      I.UNITCOST,
+      I.TITLE,
+      I.DESCRIPTION,
+      I.VIEWCOUNT,
+      I.QTY,
+      I.USERID,
+      I.PRODUCTID,
+      A.AUCTIONSTATE,
+      A.DEADLINE,
+      A.STARTPRICE,
+      A.BIDPRICE
+    FROM AUCTION A, ITEM I, ACCOUNT AC
+	WHERE AC.USERID = I.USERID AND A.ITEMID = I.ITEMID
+
+  </select>
+  
+  <insert id="insertAuction" parameterType="Auction">
+     INSERT INTO AUCTION
+     	(ITEMID, AUCTIONSTATE, DEADLINE, STARTPRICE, BIDPRICE)
+     VALUES 
+     	(#{itemId}, #{auctionState}, TO_DATE(#{deadLine}, 'yyyy-mm-dd hh24:mi:ss'), #{startPrice}, #{bidPrice})
+  </insert>
+  
+  
+  <delete id="deleteItem" parameterType="String">
+     DELETE ITEM
+     FROM ITEM
+     WHERE ITEMID = #{itemId}
+  </delete>
+  
+  
+  <update id="updateAuction">
+     UPDATE AUCTION 
+     SET 
+     	AUCTIONSTATE = #{auctionState}, 
+     	DEADLINE = TO_DATE(#{deadLine}, 'yyyy-mm-dd hh24:mi:ss'), 
+     	STARTPRICE = #{startPrice}, 
+     	BIDPRICE = #{bidPrice}
+     WHERE ITEMID = #{itemId}
+  </update>
+  
+  
+  <select id="getAuctionById" parameterType="int" resultType="Auction">
+  	SELECT
+      I.ITEMID,
+      I.UNITCOST,
+      I.TITLE,
+      I.DESCRIPTION,
+      I.VIEWCOUNT,
+      I.QTY,
+      I.USERID,
+      I.PRODUCTID,
+      A.AUCTIONSTATE,
+      A.DEADLINE,
+      A.STARTPRICE,
+      A.BIDPRICE
+    FROM AUCTION A, ITEM I
+    WHERE A.ITEMID = I.ITEMID
+    	AND I.ITEMID = #{itemId}
+  </select>
+  
+  <update id="closeAuction" parameterType="Date">
+    <![CDATA[
+     UPDATE AUCTION SET AUCTIONSTATE = 1
+     WHERE DEADLINE <= #{curTime}
+    ]]>
+  </update>
+  
+   <update id="updateAuctionUnitCost">
+     UPDATE ITEM
+     SET UNITCOST = #{param1}
+     WHERE ITEMID = #{param2}
+  </update>
+  
+   <update id="updateBidder">
+     UPDATE BIDDER
+     SET BIDDER = #{param1}
+     WHERE ITEMID = #{param2}
+</update>
+
+  <insert id="insertBidder" parameterType="Bidder">
+     INSERT INTO BIDDER
+     	(ITEMID, BIDDER)
+     VALUES 
+     	(#{itemId}, #{bidder})
+  </insert>
+
+	<select id="isBidderExist" parameterType = "int" resultType="String">
+	 	SELECT BIDDER
+     	FROM BIDDER
+    	WHERE ITEMID = #{itemId}
+	</select>
+
+	<update id="updateBidPrice">
+     	UPDATE AUCTION
+     	SET BIDPRICE= #{param1}
+     	WHERE ITEMID = #{param2}
+	</update>
+	
+	<select id="getBidderList" resultType="Bidder">
+	 	SELECT ITEMID, BIDDER
+     	FROM BIDDER
+	</select>
+</mapper>

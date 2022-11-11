@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.secondhand.dao.mybatis.mapper.ItemMapper">
+  	<cache />
+	<insert id="insertItem">
+		<selectKey keyProperty="itemId" resultType="int" order="BEFORE">
+			SELECT ITEMID_seq.nextval AS itemId FROM DUAL
+		</selectKey> 
+		INSERT INTO ITEM
+		(ITEMID, UNITCOST, TITLE, DESCRIPTION, VIEWCOUNT, QTY, USERID, PRODUCTID) VALUES
+		(#{itemId}, #{unitCost}, #{title}, #{description}, #{viewCount}, #{qty}, #{userId}, #{productId})
+	</insert>
+
+	<update id="updateItem">
+		UPDATE ITEM 
+		SET
+			UNITCOST = #{unitCost},
+			TITLE = #{title},
+			DESCRIPTION = #{description},
+			VIEWCOUNT = #{viewCount},
+			QTY = #{qty}
+		WHERE itemId = #{itemId}
+	</update>
+
+	<update id="updateViewCount">
+		UPDATE ITEM 
+		SET VIEWCOUNT = #{param1}
+		WHERE itemId = #{param2}		
+	</update>
+	
+	<select id="getItemByPId" resultType="Item">
+      SELECT
+         I.ITEMID,
+         I.UNITCOST,
+         I.TITLE,
+         I.DESCRIPTION,
+         I.VIEWCOUNT,
+         I.QTY,
+         I.USERID,
+         I.PRODUCTID
+      FROM ITEM I
+      WHERE I.PRODUCTID = #{productId}
+   </select>
+   	
+	<delete id="deleteItem">
+		DELETE FROM ITEM
+		WHERE ITEMID = #{itemId} 
+	</delete>
+
+	<select id="getItem" parameterType="int" resultType="Item">
+		SELECT
+			ITEMID,
+			UNITCOST,
+			TITLE,
+			DESCRIPTION,
+			VIEWCOUNT,
+			QTY,
+			USERID,
+			PRODUCTID
+		FROM ITEM
+		WHERE ITEMID = #{itemId}
+	</select>
+
+	<select id="getQuantity" resultType="int">
+		SELECT QTY
+		FROM ITEM
+		WHERE ITEMID = #{param1} AND PRODUCTID = #{param2}
+	</select>
+
+	<update id="updateInventoryQuantity">
+		UPDATE ITEM
+		SET QTY = QTY - #{increment}
+		WHERE ITEMID = #{itemId}
+	</update>
+	
+	<select id="getUserIdByItemId" parameterType="int" resultType="String">
+		SELECT USERID AS "userId"
+		FROM ITEM
+		WHERE ITEMID = #{itemId}
+	</select>
+	
+	<select id="getItemByTitle" parameterType="String" resultType="Item">
+		SELECT
+			ITEMID,
+			UNITCOST,
+			TITLE,
+			DESCRIPTION,
+			VIEWCOUNT,
+			QTY,
+			USERID,
+			PRODUCTID
+		FROM ITEM
+		WHERE lower(title) like #{title}
+	</select>
+</mapper>

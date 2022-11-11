@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.secondhand.dao.mybatis.mapper.AccuseMapper">
+  <cache />
+  
+  	<insert id="insertAccuse" parameterType="Accuse">
+     INSERT INTO ACCUSE (ACCUSEID, VICTIM, ATTACKER, REASON)
+     VALUES (ACCUSEID_SEQ.NEXTVAL, #{victim}, #{attacker}, #{reason})
+  	</insert>
+  	
+  	<select id="countAccuseById" parameterType="String" resultType="Accuse">
+  		SELECT COUNT(ATTACKER) AS "accuseCount"
+  		FROM ACCUSE
+  		WHERE ATTACKER = #{attacker}
+  	</select>
+  	
+  	<select id="isAccuseAlready" parameterType="String" resultType="String">
+  		SELECT CASE WHEN (COUNT(ACCUSEID) > 0) 
+  		THEN 'true' ELSE 'false' END AS "isAccuse"
+  		FROM ACCUSE
+  		WHERE ATTACKER = #{attacker} AND VICTIM = #{victim} 		
+  	</select>
+  	
+  	<select id="selectAccuseList" parameterType="String" resultType="Accuse">
+  		SELECT ATTACKER, REASON
+		FROM ACCUSE
+		WHERE VICTIM = #{victim}
+  	</select>
+ </mapper>

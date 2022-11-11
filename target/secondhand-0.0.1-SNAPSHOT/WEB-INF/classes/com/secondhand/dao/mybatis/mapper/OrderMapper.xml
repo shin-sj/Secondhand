@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.secondhand.dao.mybatis.mapper.OrderMapper">
+
+	<cache />
+
+	<select id="getOrder" resultType="Orders">
+		select
+			BILLADDR1,
+			BILLADDR2,
+			BILLCITY,
+			BILLCOUNTRY,
+			BILLTOUSERNAME,
+			BILLZIP,
+			SHIPADDR1,
+			SHIPADDR2,
+			SHIPCITY,
+			SHIPCOUNTRY,
+			SHIPTOUSERNAME,
+			SHIPZIP,
+			CARDTYPE,
+			COURIER,
+			CREDITCARD,
+			EXPRDATE AS expiryDate,
+			LOCALE,
+			ORDERDATE,
+			ORDERS.ORDERID,
+			TOTALPRICE,
+			USERID,
+			STATUS
+		FROM ORDERS
+		WHERE ORDERS.ORDERID = #{value}
+	</select>
+
+	<select id="getOrdersByUserId" resultType="Orders">
+		SELECT
+			BILLADDR1,
+			BILLADDR2,
+			BILLCITY,
+			BILLCOUNTRY,
+			BILLTOUSERNAME,
+			BILLZIP,
+			SHIPADDR1,
+			SHIPADDR2,
+			SHIPCITY,
+			SHIPCOUNTRY,
+			SHIPTOUSERNAME,
+			SHIPZIP,
+			CARDTYPE,
+			COURIER,
+			CREDITCARD,
+			EXPRDATE AS expiryDate,
+			LOCALE,
+			ORDERDATE,
+			ORDERS.ORDERID,
+			TOTALPRICE,
+			USERID,
+			STATUS
+		FROM ORDERS
+		WHERE ORDERS.USERID = #{value}
+		ORDER BY ORDERDATE
+	</select>
+
+	<resultMap id="OrderAndLineitemMap" type="Orders">
+		<id column="ORDERID" property="orderId" />
+		<result column="USERID" property="userId" />
+		<result column="USERNAME" property="username"/>
+		<result column="BILLADDR1" property="billAddr1"/>
+		<result column="BILLADDR2" property="billAddr2"/>
+		<result column="BILLCITY" property="billCity"/>
+		<result column="BILLCOUNTRY" property="billCountry"/>
+		<result column="BILLTOUSERNAME" property="billToUsername"/>
+		<result column="BILLZIP" property="billZip" />
+		<result column="SHIPTOUSERNAME" property="shipToUsername"/>
+		<result column="SHIPADDR1" property="shipAddr1"/>
+		<result column="SHIPADDR2" property="shipAddr2"/>
+		<result column="SHIPCITY" property="shipCity"/>
+		<result column="SHIPCOUNTRY" property="shipCountry"/>
+		<result column="SHIPZIP" property="shipZip" />
+		<result column="TOTALPRICE" property="totalPrice"/>
+		<result column="UNITCOST" property="unitCost"/>
+		<result column="ORDERDATE" property="orderDate" />
+		<result column="CARDTYPE" property="cardType" />
+		<result column="COURIER" property="courier" />
+		<result column="CREDITCARD" property="creditCard" />
+		<result column="EXPIRYDATE" property="expiryDate" />
+		<result column="LOCALE" property="locale" />
+		<result column="STATUS" property="status" />
+		<collection property="lineItems" ofType="LineItem">
+			<id column="ORDERID" property="orderId" />
+			<id column="LINENUM" property="lineNum" />
+			<result column="ITEMID" property="itemId" />
+			<result column="QUANTITY" property="quantity" />
+			<result column="UNITPRICE" property="unitPrice" />
+		</collection>
+	</resultMap>
+
+	<select id="getOrderAndLineitems" resultMap="OrderAndLineitemMap">
+		SELECT
+			BILLADDR1, BILLADDR2, BILLCITY, BILLCOUNTRY,
+			BILLTOUSERNAME, BILLZIP, SHIPADDR1, SHIPADDR2,
+			SHIPCITY, SHIPCOUNTRY, SHIPTOUSERNAME, SHIPZIP, CARDTYPE, COURIER,
+			CREDITCARD, EXPRDATE AS expiryDate, LOCALE, ORDERDATE, ORDERS.ORDERID,
+			TOTALPRICE, USERID, STATUS,
+			LINEITEM.LINENUM, LINEITEM.ITEMID, LINEITEM.QUANTITY, LINEITEM.UNITPRICE
+		FROM ORDERS, LINEITEM
+		WHERE ORDERS.ORDERID = #{value}
+				AND ORDERS.ORDERID = LINEITEM.ORDERID
+	</select>
+
+	<insert id="insertOrder">
+		<selectKey keyProperty="orderId" resultType="int" order="BEFORE">
+			SELECT ORDERID_seq.nextval AS orderId FROM DUAL
+		</selectKey> 
+		INSERT INTO ORDERS (ORDERID, USERID, ORDERDATE, SHIPADDR1, SHIPADDR2,
+				SHIPCITY,
+				SHIPZIP, SHIPCOUNTRY, BILLADDR1, BILLADDR2, BILLCITY, BILLZIP, BILLCOUNTRY,
+				COURIER, TOTALPRICE, BILLTOUSERNAME, SHIPTOUSERNAME,
+				CREDITCARD, EXPRDATE, CARDTYPE, LOCALE)
+		VALUES(#{orderId}, #{userId}, #{orderDate},
+				#{shipAddr1}, #{shipAddr2,jdbcType=VARCHAR}, #{shipCity},
+				#{shipZip}, #{shipCountry}, #{billAddr1}, #{billAddr2,jdbcType=VARCHAR},
+				#{billCity}, #{billZip}, #{billCountry}, #{courier}, #{totalPrice}, #{billToUsername},
+				#{shipToUsername}, #{creditCard}, #{expiryDate}, #{cardType}, #{locale})
+	</insert>
+
+	<insert id="msSqlServerInsertOrder" useGeneratedKeys="true">
+		insert into orders (userId, orderDate, shipaddr1, shipaddr2,
+				shipCity, shipState, shipZip, shipCountry, billaddr1, billaddr2,
+				billCity, billZip, billCountry, courier, totalPrice,
+				billtoUsername, shiptoUsername, creditCard, exprDate, cardType, locale)
+		values (#userId#,
+				#orderDate#, #shipAddress1#, #shipAddress2:VARCHAR#, #shipCity#,
+				#shipState#, #shipZip#, #shipCountry#, #billAddress1#,
+				#billAddress2:VARCHAR#, #billCity#, #billState#, #billZip#,
+				#billCountry#, #courier#, #totalPrice#, #billToFirstName#,
+				#billToLastName#, #shipToFirstName#, #shipToLastName#,
+				#creditCard#, #expiryDate#, #cardType#, #locale#);
+		select @@identity as value
+	</insert>
+
+</mapper>
